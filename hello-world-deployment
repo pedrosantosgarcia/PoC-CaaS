@@ -14,7 +14,7 @@ spec:
         app: hello-world
     spec:
       containers:
-      - image: gcr.io/heptio-images/ks-guestbook-demo:0.2
+      - image: harbor.frontedge.net/poc-caas/ks-guestbook-demo
         name: hello-world
         ports:
         - containerPort: 80
