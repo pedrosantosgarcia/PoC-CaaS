@@ -1,20 +1,57 @@
+---
+# hello-kubernetes.custom-message.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-hello-world
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: hello-kubernetes
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-world
+  name: hello-kubernetes
 spec:
   replicas: 3
-  revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: hello-world
+      app: hello-kubernetes
   template:
     metadata:
       labels:
-        app: hello-world
+        app: hello-kubernetes
     spec:
       containers:
-      - image: harbor.frontedge.net/poc-caas/ks-guestbook-demo
-        name: hello-world
+      - name: hello-kubernetes
+        image: harbor.frontedge.net/poc-caas/hello-kubernetes
         ports:
-        - containerPort: 80
+        - containerPort: 8080
+        env:
+        - name: MESSAGE
+          value: I just deployed this on Kubernetes!
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: poc-caas
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: poc-caas-01.apps.k8s-001.frontedge.net
+    http:
+      paths:
+      - backend:
+          service:
+            name: svc-hello-world
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+status:
+  loadBalancer: {}
+---
